@@ -5,11 +5,14 @@ use std::borrow::Cow;
 
 macro_rules! decimal_impl {
     ($type:ty) => {
+        decimal_impl!($type => Number, "Number");
+    };
+    ($type:ty => $instance_type:ident, $name:expr) => {
         impl JsonSchema for $type {
             no_ref_schema!();
 
             fn schema_name() -> String {
-                "Decimal".to_owned()
+                $name.to_owned()
             }
 
             fn schema_id() -> Cow<'static, str> {
@@ -18,11 +21,7 @@ macro_rules! decimal_impl {
 
             fn json_schema(_: &mut SchemaGenerator) -> Schema {
                 SchemaObject {
-                    instance_type: Some(InstanceType::String.into()),
-                    string: Some(Box::new(StringValidation {
-                        pattern: Some(r"^-?[0-9]+(\.[0-9]+)?$".to_owned()),
-                        ..Default::default()
-                    })),
+                    instance_type: Some(InstanceType::$instance_type.into()),
                     ..Default::default()
                 }
                 .into()
